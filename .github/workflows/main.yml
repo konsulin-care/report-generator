@@ -1,0 +1,48 @@
+name: Send Email from JSON Payload
+
+on:
+  workflow_dispatch:
+    inputs:
+      payload:
+        description: 'JSON payload with report content'
+        required: true
+
+jobs:
+  send-email:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout (empty repository)
+        uses: actions/checkout@v4.1.1
+
+      - name: Parse JSON and set outputs
+        id: parse_payload
+        run: |
+          echo "Parsing JSON input..."
+          echo '${{ github.event.inputs.payload }}' > payload.json
+
+          title=$(jq -r '.title' payload.json)
+          email=$(jq -r '.email' payload.json)
+          exec_summary=$(jq -r '.exec_summary' payload.json)
+
+          echo "title=$title" >> $GITHUB_OUTPUT
+          echo "email=$email" >> $GITHUB_OUTPUT
+          echo "exec_summary=$exec_summary" >> $GITHUB_OUTPUT
+
+      - name: Send Email
+        uses: dawidd6/action-send-mail@v3.11.0
+        with:
+          connection_url: ${{ secrets.SMTP_CONNECTION_URL }}
+          subject: "Executive Summary: ${{ steps.parse_payload.outputs.title }}"
+          body: |
+            Hello,
+
+            Here is the executive summary:
+
+            ${{ steps.parse_payload.outputs.exec_summary }}
+
+          to: ${{ steps.parse_payload.outputs.email }}
+          from: ${{ secrets.EMAIL_FROM }}
+          secure: true
+
