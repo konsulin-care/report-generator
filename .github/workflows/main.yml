@@ -49,22 +49,22 @@ jobs:
           sed -i "s/{recommendation}/${{ steps.parse_payload.outputs.recommendation }}/g" report.qmd
 
       - name: Setup Quarto
-        uses: quarto-dev/quarto-actions/setup@v2  # install Quarto via official action :contentReference[oaicite:0]{index=0}
+        uses: quarto-dev/quarto-actions/setup@v2 # Install Quarto via official action
 
       - name: Render report.qmd to PDF
         uses: quarto-dev/quarto-actions/render@v2
         with:
           to: latex
-          path: report.qmd  # render only this file :contentReference[oaicite:1]{index=1}
+          path: report.qmd
 
       - name: Compile LaTeX to PDF
-        uses: xu-cheng/latex-action@v3.1.0  # ✅ Pin latex-action to specific version
+        uses: xu-cheng/latex-action@v3 # Pin latex-action to specific version
         with:
           root_file: report.tex
           latexmk_use_xelatex: true
 
       - name: Upload PDF artifact
-        uses: actions/upload-artifact@v4.3.1  # ✅ Pin upload artifact action
+        uses: actions/upload-artifact@v4.3.1 # Pin upload artifact action
         with:
           name: rendered-pdf
           path: report.pdf
@@ -95,7 +95,7 @@ jobs:
             **Virtual Assistant**  
             Konsulin  
             *Psychological Kit in Your Pocket*  
-          attachments: report.pdf  # attach the rendered PDF :contentReference[oaicite:2]{index=2}
+          attachments: report.pdf # Attach the rendered PDF
 
       - name: Cleanup temporary files
         if: always()
