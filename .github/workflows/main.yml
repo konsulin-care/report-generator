@@ -30,13 +30,13 @@ jobs:
           recommendation=$(jq -r '.recommendation' payload.json)
           current_date=$(date +"%Y-%m-%d")
 
-          echo "title=$title"           >> $GITHUB_OUTPUT
-          echo "email=$email"           >> $GITHUB_OUTPUT
+          echo "title=$title" >> $GITHUB_OUTPUT
+          echo "email=$email" >> $GITHUB_OUTPUT
           echo "exec_summary=$exec_summary" >> $GITHUB_OUTPUT
           echo "introduction=$introduction" >> $GITHUB_OUTPUT
-          echo "findings=$findings"     >> $GITHUB_OUTPUT
+          echo "findings=$findings" >> $GITHUB_OUTPUT
           echo "recommendation=$recommendation" >> $GITHUB_OUTPUT
-          echo "current_date=$current_date"     >> $GITHUB_OUTPUT
+          echo "current_date=$current_date" >> $GITHUB_OUTPUT
 
       - name: Generate report.qmd from template
         run: |
@@ -93,4 +93,4 @@ jobs:
 
       - name: Cleanup temporary files
         if: always()
-        run: rm -f report.qmd report.pdf report.tex
+        run: rm -f report*
