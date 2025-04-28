@@ -61,19 +61,7 @@ jobs:
         uses: xu-cheng/latex-action@v3 # Pin latex-action to specific version
         with:
           root_file: report.tex
-          latexmk_use_lualatex: true
-
-      - name: Cache LaTeX Docker Image
-        uses: actions/cache@v4
-        with:
-          path: /home/runner/.cache/docker
-          key: ${{ runner.os }}-latex-docker-${{ hashFiles('Dockerfile') }}
-
-      - name: Upload PDF artifact
-        uses: actions/upload-artifact@v4.3.1 # Pin upload artifact action
-        with:
-          name: rendered-pdf
-          path: report.pdf
+          latexmk_use_xelatex: true
 
       - name: Send Email with Attachment
         uses: dawidd6/action-send-mail@v3.11.0
