@@ -33,16 +33,27 @@ jobs:
       - name: Send Email
         uses: dawidd6/action-send-mail@v3.11.0
         with:
-          connection_url: ${{ secrets.SMTP_CONNECTION_URL }}
-          subject: "Executive Summary: ${{ steps.parse_payload.outputs.title }}"
-          body: |
-            Hello,
-
-            Here is the executive summary:
-
-            ${{ steps.parse_payload.outputs.exec_summary }}
-
-          to: ${{ steps.parse_payload.outputs.email }}
-          from: ${{ secrets.EMAIL_FROM }}
+          server_address: ${{ vars.SMTP_SERVER }}
+          server_port: ${{ vars.SMTP_SERVER_PORT }}
           secure: true
+          username: ${{ vars.EMAIL_ADDRESS }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          convert_markdown: true
+          subject: "${{ steps.parse_payload.outputs.title }}"
+          from: ${{ vars.EMAIL_NAME }}
+          to: ${{ steps.parse_payload.outputs.email }}
+          body: |
+            Hai Orang Baik,
 
+            Berikut adalah hasil analisisku terkait kondisi kamu:
+
+            > ${{ steps.parse_payload.outputs.exec_summary }}
+
+            Salam hangat,
+
+
+            Lyna  
+
+            **Virtual Assistant**  
+            Konsulin  
+            *Psychological Kit in Your Pocket*  
