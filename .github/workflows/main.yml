@@ -63,6 +63,12 @@ jobs:
           root_file: report.tex
           latexmk_use_lualatex: true
 
+      - name: Cache LaTeX Docker Image
+        uses: actions/cache@v2
+        with:
+          path: /home/runner/.cache/docker
+          key: ${{ runner.os }}-latex-docker-${{ hashFiles('Dockerfile') }}
+
       - name: Upload PDF artifact
         uses: actions/upload-artifact@v4.3.1 # Pin upload artifact action
         with:
