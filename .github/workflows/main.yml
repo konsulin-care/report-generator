@@ -10,10 +10,10 @@ on:
 jobs:
   send-email:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     steps:
-      - name: Checkout (empty repository)
+      - name: Checkout repository
         uses: actions/checkout@v4.1.1
 
       - name: Parse JSON and set outputs
@@ -25,12 +25,39 @@ jobs:
           title=$(jq -r '.title' payload.json)
           email=$(jq -r '.email' payload.json)
           exec_summary=$(jq -r '.exec_summary' payload.json)
+          introduction=$(jq -r '.introduction' payload.json)
+          findings=$(jq -r '.finding' payload.json)
+          recommendation=$(jq -r '.recommendation' payload.json)
+          current_date=$(date +"%Y-%m-%d")
 
-          echo "title=$title" >> $GITHUB_OUTPUT
-          echo "email=$email" >> $GITHUB_OUTPUT
+          echo "title=$title"           >> $GITHUB_OUTPUT
+          echo "email=$email"           >> $GITHUB_OUTPUT
           echo "exec_summary=$exec_summary" >> $GITHUB_OUTPUT
+          echo "introduction=$introduction" >> $GITHUB_OUTPUT
+          echo "findings=$findings"     >> $GITHUB_OUTPUT
+          echo "recommendation=$recommendation" >> $GITHUB_OUTPUT
+          echo "current_date=$current_date"     >> $GITHUB_OUTPUT
 
-      - name: Send Email
+      - name: Generate report.qmd from template
+        run: |
+          cp template.qmd report.qmd
+          sed -i "s/{title}/${{ steps.parse_payload.outputs.title }}/g"            report.qmd
+          sed -i "s/{current_date}/${{ steps.parse_payload.outputs.current_date }}/g"  report.qmd
+          sed -i "s/{executive_summary}/${{ steps.parse_payload.outputs.exec_summary }}/g" report.qmd
+          sed -i "s/{introduction}/${{ steps.parse_payload.outputs.introduction }}/g"     report.qmd
+          sed -i "s/{findings}/${{ steps.parse_payload.outputs.findings }}/g"           report.qmd
+          sed -i "s/{recommendation}/${{ steps.parse_payload.outputs.recommendation }}/g" report.qmd
+
+      - name: Setup Quarto
+        uses: quarto-dev/quarto-actions/setup@v2  # install Quarto via official action :contentReference[oaicite:0]{index=0}
+
+      - name: Render report.qmd to PDF
+        uses: quarto-dev/quarto-actions/render@v2
+        with:
+          to: pdf
+          path: report.qmd  # render only this file :contentReference[oaicite:1]{index=1}
+
+      - name: Send Email with Attachment
         uses: dawidd6/action-send-mail@v3.11.0
         with:
           server_address: ${{ vars.SMTP_SERVER }}
@@ -51,9 +78,13 @@ jobs:
 
             Salam hangat,
 
-
             Lyna  
 
             **Virtual Assistant**  
             Konsulin  
             *Psychological Kit in Your Pocket*  
+          attachments: report.pdf  # attach the rendered PDF :contentReference[oaicite:2]{index=2}
+
+      - name: Cleanup temporary files
+        if: always()
+        run: rm -f report.qmd report.pdf
