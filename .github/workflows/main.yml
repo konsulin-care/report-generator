@@ -61,7 +61,7 @@ jobs:
         uses: xu-cheng/latex-action@v3 # Pin latex-action to specific version
         with:
           root_file: report.tex
-          latexmk_use_xelatex: true
+          latexmk_use_lualatex: true
 
       - name: Upload PDF artifact
         uses: actions/upload-artifact@v4.3.1 # Pin upload artifact action
