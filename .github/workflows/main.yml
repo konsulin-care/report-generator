@@ -41,11 +41,11 @@ jobs:
       - name: Generate report.qmd from template
         run: |
           cp template.qmd report.qmd
-          sed -i "s/{title}/${{ steps.parse_payload.outputs.title }}/g"            report.qmd
-          sed -i "s/{current_date}/${{ steps.parse_payload.outputs.current_date }}/g"  report.qmd
+          sed -i "s/{title}/${{ steps.parse_payload.outputs.title }}/g" report.qmd
+          sed -i "s/{current_date}/${{ steps.parse_payload.outputs.current_date }}/g" report.qmd
           sed -i "s/{executive_summary}/${{ steps.parse_payload.outputs.exec_summary }}/g" report.qmd
-          sed -i "s/{introduction}/${{ steps.parse_payload.outputs.introduction }}/g"     report.qmd
-          sed -i "s/{findings}/${{ steps.parse_payload.outputs.findings }}/g"           report.qmd
+          sed -i "s/{introduction}/${{ steps.parse_payload.outputs.introduction }}/g" report.qmd
+          sed -i "s/{findings}/${{ steps.parse_payload.outputs.findings }}/g" report.qmd
           sed -i "s/{recommendation}/${{ steps.parse_payload.outputs.recommendation }}/g" report.qmd
 
       - name: Setup Quarto
@@ -54,8 +54,14 @@ jobs:
       - name: Render report.qmd to PDF
         uses: quarto-dev/quarto-actions/render@v2
         with:
-          to: pdf
+          to: latex
           path: report.qmd  # render only this file :contentReference[oaicite:1]{index=1}
+
+      - name: Compile LaTeX to PDF
+        uses: xu-cheng/latex-action@v3.1.0  # ✅ Pin latex-action to specific version
+        with:
+          root_file: report.tex
+          latexmk_use_xelatex: true
 
       - name: Send Email with Attachment
         uses: dawidd6/action-send-mail@v3.11.0
